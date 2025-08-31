@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Football Draft Tracker 2025</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const DraftTracker = () => {
+            // Complete player data from your CSV file
+            const playersData = [
+                { rank: 1, name: "Ja'Marr Chase", position: "WR", positionRank: 1, tier: 1, auction: 63 },
+                { rank: 2, name: "Bijan Robinson", position: "RB", positionRank: 1, tier: 1, auction: 62 },
+                { rank: 3, name: "Jahmyr Gibbs", position: "RB", positionRank: 2, tier: 1, auction: 61 },
+                { rank: 4, name: "Saquon Barkley", position: "RB", positionRank: 3, tier: 1, auction: 57 },
+                { rank: 5, name: "CeeDee Lamb", position: "WR", positionRank: 2, tier: 1, auction: 60 },
+                { rank: 6, name: "Justin Jefferson", position: "WR", positionRank: 3, tier: 1, auction: 58 },
+                { rank: 7, name: "Christian McCaffrey", position: "RB", positionRank: 4, tier: 1, auction: 51 },
+                { rank: 8, name: "Nico Collins", position: "WR", positionRank: 4, tier: 2, auction: 49 },
+                { rank: 9, name: "Puka Nacua", position: "WR", positionRank: 5, tier: 2, auction: 47 },
+                { rank: 10, name: "Malik Nabers", position: "WR", positionRank: 6, tier: 2, auction: 45 },
+                { rank: 11, name: "Drake London", position: "WR", positionRank: 7, tier: 2, auction: 44 },
+                { rank: 12, name: "Brian Thomas", position: "WR", positionRank: 8, tier: 2, auction: 43 },
+                { rank: 13, name: "Amon-Ra St. Brown", position: "WR", positionRank: 9, tier: 2, auction: 42 },
+                { rank: 14, name: "Derrick Henry", position: "RB", positionRank: 5, tier: 2, auction: 37 },
+                { rank: 15, name: "De'Von Achane", position: "RB", positionRank: 6, tier: 2, auction: 36 },
+                { rank: 16, name: "Ashton Jeanty", position: "RB", positionRank: 7, tier: 3, auction: 33 },
+                { rank: 17, name: "AJ Brown", position: "WR", positionRank: 10, tier: 3, auction: 36 },
+                { rank: 18, name: "Brock Bowers", position: "TE", positionRank: 1, tier: 3, auction: 33 },
+                { rank: 19, name: "Chase Brown", position: "RB", positionRank: 8, tier: 3, auction: 31 },
+                { rank: 20, name: "Bucky Irving", position: "RB", positionRank: 9, tier: 4, auction: 31 },
+                { rank: 21, name: "Jonathan Taylor", position: "RB", positionRank: 10, tier: 4, auction: 30 },
+                { rank: 22, name: "Josh Jacobs", position: "RB", positionRank: 11, tier: 4, auction: 29 },
+                { rank: 23, name: "Ladd McConkey", position: "WR", positionRank: 11, tier: 4, auction: 31 },
+                { rank: 24, name: "Trey McBride", position: "TE", positionRank: 2, tier: 5, auction: 29 },
+                { rank: 25, name: "Josh Allen", position: "QB", positionRank: 1, tier: 5, auction: 27 },
+                { rank: 26, name: "Jaxon Smith-Njigba", position: "WR", positionRank: 12, tier: 6, auction: 29 },
+                { rank: 27, name: "Omarion Hampton", position: "RB", positionRank: 12, tier: 6, auction: 26 },
+                { rank: 28, name: "Tee Higgins", position: "WR", positionRank: 13, tier: 6, auction: 28 },
+                { rank: 29, name: "Lamar Jackson", position: "QB", positionRank: 2, tier: 6, auction: 25 },
+                { rank: 30, name: "Tyreek Hill", position: "WR", positionRank: 14, tier: 7, auction: 26 },
+                { rank: 31, name: "Davante Adams", position: "WR", positionRank: 15, tier: 7, auction: 25 },
+                { rank: 32, name: "Kenneth Walker", position: "RB", positionRank: 13, tier: 7, auction: 23 },
+                { rank: 33, name: "Kyren Williams", position: "RB", positionRank: 14, tier: 7, auction: 23 },
+                { rank: 34, name: "TreVeyon Henderson", position: "RB", positionRank: 15, tier: 7, auction: 22 },
+                { rank: 35, name: "Jayden Daniels", position: "QB", positionRank: 3, tier: 7, auction: 22 },
+                { rank: 36, name: "Jalen Hurts", position: "QB", positionRank: 4, tier: 7, auction: 22 },
+                { rank: 37, name: "Alvin Kamara", position: "RB", positionRank: 16, tier: 7, auction: 21 },
+                { rank: 38, name: "George Kittle", position: "TE", positionRank: 3, tier: 7, auction: 23 },
+                { rank: 39, name: "Mike Evans", position: "WR", positionRank: 16, tier: 7, auction: 22 },
+                { rank: 40, name: "James Cook", position: "RB", positionRank: 17, tier: 7, auction: 20 },
+                { rank: 41, name: "Breece Hall", position: "RB", positionRank: 18, tier: 8, auction: 20 },
+                { rank: 42, name: "Garrett Wilson", position: "WR", positionRank: 17, tier: 8, auction: 21 },
+                { rank: 43, name: "Marvin Harrison", position: "WR", positionRank: 18, tier: 8, auction: 20 },
+                { rank: 44, name: "Devonta Smith", position: "WR", positionRank: 19, tier: 8, auction: 20 },
+                { rank: 45, name: "Tetairoa McMillan", position: "WR", positionRank: 20, tier: 8, auction: 20 },
+                { rank: 46, name: "Jameson Williams", position: "WR", positionRank: 21, tier: 8, auction: 19 },
+                { rank: 47, name: "George Pickens", position: "WR", positionRank: 22, tier: 8, auction: 19 },
+                { rank: 48, name: "Calvin Ridley", position: "WR", positionRank: 23, tier: 8, auction: 19 },
+                { rank: 49, name: "Emeka Egbuka", position: "WR", positionRank: 24, tier: 8, auction: 18 },
+                { rank: 50, name: "James Conner", position: "RB", positionRank: 19, tier: 8, auction: 17 },
+                { rank: 51, name: "DK Metcalf", position: "WR", positionRank: 25, tier: 9, auction: 18 },
+                { rank: 52, name: "Xavier Worthy", position: "WR", positionRank: 26, tier: 9, auction: 18 },
+                { rank: 53, name: "Terry McLaurin", position: "WR", positionRank: 27, tier: 9, auction: 17 },
+                { rank: 54, name: "Chuba Hubbard", position: "RB", positionRank: 20, tier: 9, auction: 16 },
+                { rank: 55, name: "Tony Pollard", position: "RB", positionRank: 21, tier: 9, auction: 16 },
+                { rank: 56, name: "RJ Harvey", position: "RB", positionRank: 22, tier: 9, auction: 16 },
+                { rank: 57, name: "Courtland Sutton", position: "WR", positionRank: 28, tier: 9, auction: 16 },
+                { rank: 58, name: "Travis Hunter", position: "WR", positionRank: 29, tier: 9, auction: 16 },
+                { rank: 59, name: "Jaylen Waddle", position: "WR", positionRank: 30, tier: 9, auction: 16 },
+                { rank: 60, name: "DJ Moore", position: "WR", positionRank: 31, tier: 9, auction: 16 },
+                { rank: 61, name: "Joe Burrow", position: "QB", positionRank: 5, tier: 10, auction: 15 },
+                { rank: 62, name: "Rashee Rice", position: "WR", positionRank: 32, tier: 10, auction: 15 },
+                { rank: 63, name: "Stefon Diggs", position: "WR", positionRank: 33, tier: 10, auction: 15 },
+                { rank: 64, name: "Isiah Pacheco", position: "RB", positionRank: 23, tier: 10, auction: 14 },
+                { rank: 65, name: "Ricky Pearsall", position: "WR", positionRank: 34, tier: 10, auction: 14 },
+                { rank: 66, name: "Zay Flowers", position: "WR", positionRank: 35, tier: 10, auction: 14 },
+                { rank: 67, name: "Rome Odunze", position: "WR", positionRank: 36, tier: 10, auction: 14 },
+                { rank: 68, name: "D'Andre Swift", position: "RB", positionRank: 24, tier: 11, auction: 14 },
+                { rank: 69, name: "David Montgomery", position: "RB", positionRank: 25, tier: 11, auction: 13 },
+                { rank: 70, name: "Matthew Golden", position: "WR", positionRank: 37, tier: 11, auction: 13 },
+                { rank: 71, name: "Chris Olave", position: "WR", positionRank: 38, tier: 11, auction: 13 },
+                { rank: 72, name: "Jakobi Meyers", position: "WR", positionRank: 39, tier: 11, auction: 13 },
+                { rank: 73, name: "Aaron Jones", position: "RB", positionRank: 26, tier: 11, auction: 13 },
+                { rank: 74, name: "Jerry Jeudy", position: "WR", positionRank: 40, tier: 11, auction: 13 },
+                { rank: 75, name: "Deebo Samuel", position: "WR", positionRank: 41, tier: 11, auction: 12 },
+                { rank: 76, name: "Sam LaPorta", position: "TE", positionRank: 4, tier: 12, auction: 15 },
+                { rank: 77, name: "Jordan Addison", position: "WR", positionRank: 42, tier: 12, auction: 12 },
+                { rank: 78, name: "Khalil Shakir", position: "WR", positionRank: 43, tier: 13, auction: 12 },
+                { rank: 79, name: "Jaylen Warren", position: "RB", positionRank: 27, tier: 13, auction: 12 },
+                { rank: 80, name: "Tyrone Tracy", position: "RB", positionRank: 28, tier: 13, auction: 12 },
+                { rank: 81, name: "Kaleb Johnson", position: "RB", positionRank: 29, tier: 13, auction: 11 },
+                { rank: 82, name: "JK Dobbins", position: "RB", positionRank: 30, tier: 14, auction: 11 },
+                { rank: 83, name: "Keon Coleman", position: "WR", positionRank: 44, tier: 14, auction: 11 },
+                { rank: 84, name: "Patrick Mahomes", position: "QB", positionRank: 6, tier: 14, auction: 11 },
+                { rank: 85, name: "Josh Downs", position: "WR", positionRank: 45, tier: 14, auction: 11 },
+                { rank: 86, name: "Justin Fields", position: "QB", positionRank: 7, tier: 15, auction: 11 },
+                { rank: 87, name: "Kyler Murray", position: "QB", positionRank: 8, tier: 15, auction: 11 },
+                { rank: 88, name: "Cooper Kupp", position: "WR", positionRank: 46, tier: 15, auction: 10 },
+                { rank: 89, name: "Mark Andrews", position: "TE", positionRank: 5, tier: 15, auction: 13 },
+                { rank: 90, name: "TJ Hockenson", position: "TE", positionRank: 6, tier: 15, auction: 10 },
+                { rank: 91, name: "Drake Maye", position: "QB", positionRank: 9, tier: 15, auction: 10 },
+                { rank: 92, name: "Bo Nix", position: "QB", positionRank: 10, tier: 15, auction: 10 },
+                { rank: 93, name: "Darnell Mooney", position: "WR", positionRank: 47, tier: 15, auction: 9 },
+                { rank: 94, name: "Caleb Williams", position: "QB", positionRank: 11, tier: 15, auction: 10 },
+                { rank: 95, name: "Jauan Jennings", position: "WR", positionRank: 48, tier: 15, auction: 9 },
+                { rank: 96, name: "Jordan Mason", position: "RB", positionRank: 31, tier: 15, auction: 9 },
+                { rank: 97, name: "Brock Purdy", position: "QB", positionRank: 12, tier: 15, auction: 9 },
+                { rank: 98, name: "Dak Prescott", position: "QB", positionRank: 13, tier: 15, auction: 9 },
+                { rank: 99, name: "Baker Mayfield", position: "QB", positionRank: 14, tier: 15, auction: 9 },
+                { rank: 100, name: "Rashid Shaheed", position: "WR", positionRank: 49, tier: 15, auction: 8 },
+                { rank: 101, name: "Michael Pittman", position: "WR", positionRank: 50, tier: 16, auction: 8 },
+                { rank: 102, name: "Christian Kirk", position: "WR", positionRank: 51, tier: 16, auction: 8 },
+                { rank: 103, name: "Justin Herbert", position: "QB", positionRank: 15, tier: 16, auction: 9 },
+                { rank: 104, name: "Travis Etienne", position: "RB", positionRank: 32, tier: 16, auction: 8 },
+                { rank: 105, name: "Tucker Kraft", position: "TE", positionRank: 7, tier: 16, auction: 8 },
+                { rank: 106, name: "Tyler Warren", position: "TE", positionRank: 8, tier: 16, auction: 8 },
+                { rank: 107, name: "Zach Charbonnet", position: "RB", positionRank: 33, tier: 16, auction: 8 },
+                { rank: 108, name: "Jacory Croskey-Merritt", position: "RB", positionRank: 34, tier: 16, auction: 8 },
+                { rank: 109, name: "Luther Burden", position: "WR", positionRank: 52, tier: 16, auction: 7 },
+                { rank: 110, name: "Cam Skattebo", position: "RB", positionRank: 35, tier: 16, auction: 8 },
+                { rank: 111, name: "Travis Kelce", position: "TE", positionRank: 9, tier: 17, auction: 8 },
+                { rank: 112, name: "Chris Godwin", position: "WR", positionRank: 53, tier: 17, auction: 7 },
+                { rank: 113, name: "Evan Engram", position: "TE", positionRank: 10, tier: 17, auction: 7 },
+                { rank: 114, name: "David Njoku", position: "TE", positionRank: 11, tier: 17, auction: 7 },
+                { rank: 115, name: "Austin Ekeler", position: "RB", positionRank: 36, tier: 17, auction: 7 },
+                { rank: 116, name: "Keenan Allen", position: "WR", positionRank: 54, tier: 18, auction: 6 },
+                { rank: 117, name: "Trevor Lawrence", position: "QB", positionRank: 16, tier: 18, auction: 7 },
+                { rank: 118, name: "Jayden Higgins", position: "WR", positionRank: 55, tier: 18, auction: 6 },
+                { rank: 119, name: "Jayden Reed", position: "WR", positionRank: 56, tier: 18, auction: 6 },
+                { rank: 120, name: "Tank Bigsby", position: "RB", positionRank: 37, tier: 18, auction: 7 },
+                { rank: 121, name: "Bhayshul Tuten", position: "RB", positionRank: 38, tier: 18, auction: 7 },
+                { rank: 122, name: "Colston Loveland", position: "TE", positionRank: 12, tier: 18, auction: 7 },
+                { rank: 123, name: "Jaydon Blue", position: "RB", positionRank: 39, tier: 18, auction: 6 },
+                { rank: 124, name: "Jordan Love", position: "QB", positionRank: 17, tier: 18, auction: 6 },
+                { rank: 125, name: "Javonte Williams", position: "RB", positionRank: 40, tier: 18, auction: 6 },
+                { rank: 126, name: "Brandon Aiyuk", position: "WR", positionRank: 57, tier: 19, auction: 5 },
+                { rank: 127, name: "Braelon Allen", position: "RB", positionRank: 41, tier: 19, auction: 6 },
+                { rank: 128, name: "Dylan Sampson", position: "RB", positionRank: 42, tier: 19, auction: 6 },
+                { rank: 129, name: "Dallas Goedert", position: "TE", positionRank: 13, tier: 19, auction: 6 },
+                { rank: 130, name: "Marvin Mims", position: "WR", positionRank: 58, tier: 20, auction: 4 },
+                { rank: 131, name: "Ollie Gordon", position: "RB", positionRank: 43, tier: 20, auction: 6 },
+                { rank: 132, name: "Woody Marks", position: "RB", positionRank: 44, tier: 20, auction: 5 },
+                { rank: 133, name: "Ray Davis", position: "RB", positionRank: 45, tier: 20, auction: 5 },
+                { rank: 134, name: "Nick Chubb", position: "RB", positionRank: 46, tier: 20, auction: 5 },
+                { rank: 135, name: "JJ McCarthy", position: "QB", positionRank: 18, tier: 20, auction: 4 },
+                { rank: 136, name: "Dalton Kincaid", position: "TE", positionRank: 14, tier: 20, auction: 5 },
+                { rank: 137, name: "Demario Douglas", position: "WR", positionRank: 59, tier: 20, auction: 4 },
+                { rank: 138, name: "Rhamondre Stevenson", position: "RB", positionRank: 47, tier: 20, auction: 5 },
+                { rank: 139, name: "Trey Benson", position: "RB", positionRank: 48, tier: 20, auction: 5 },
+                { rank: 140, name: "Jerome Ford", position: "RB", positionRank: 49, tier: 20, auction: 5 },
+                { rank: 141, name: "Jared Goff", position: "QB", positionRank: 19, tier: 20, auction: 4 },
+                { rank: 142, name: "Jake Ferguson", position: "TE", positionRank: 15, tier: 20, auction: 3 },
+                { rank: 143, name: "Jalen Coker", position: "WR", positionRank: 60, tier: 20, auction: 3 },
+                { rank: 144, name: "Cedric Tillman", position: "WR", positionRank: 61, tier: 20, auction: 3 },
+                { rank: 145, name: "Kyle Pitts", position: "TE", positionRank: 16, tier: 20, auction: 3 },
+                { rank: 146, name: "CJ Stroud", position: "QB", positionRank: 20, tier: 20, auction: 3 },
+                { rank: 147, name: "Josh Palmer", position: "WR", positionRank: 62, tier: 21, auction: 2 },
+                { rank: 148, name: "Rico Dowdle", position: "RB", positionRank: 50, tier: 21, auction: 3 },
+                { rank: 149, name: "Tre Harris", position: "WR", positionRank: 63, tier: 21, auction: 1 },
+                { rank: 150, name: "Hollywood Brown", position: "WR", positionRank: 64, tier: 21, auction: 1 },
+                { rank: 151, name: "Pat Bryant", position: "WR", positionRank: 65, tier: 21, auction: 1 },
+                { rank: 152, name: "Xavier Legette", position: "WR", positionRank: 66, tier: 21, auction: 1 },
+                { rank: 153, name: "Rashod Bateman", position: "WR", positionRank: 67, tier: 21, auction: 1 },
+                { rank: 154, name: "Romeo Doubs", position: "WR", positionRank: 68, tier: 21, auction: 1 },
+                { rank: 155, name: "Brian Robinson", position: "RB", positionRank: 51, tier: 21, auction: 1 },
+                { rank: 156, name: "Chig Okonkwo", position: "TE", positionRank: 17, tier: 22, auction: 1 },
+                { rank: 157, name: "Dont'e Thornton", position: "WR", positionRank: 69, tier: 22, auction: 1 },
+                { rank: 158, name: "Rachaad White", position: "RB", positionRank: 52, tier: 22, auction: 1 },
+                { rank: 159, name: "Bryce Young", position: "QB", positionRank: 21, tier: 22, auction: 1 },
+                { rank: 160, name: "Kyle Williams", position: "WR", positionRank: 70, tier: 22, auction: 1 },
+                { rank: 161, name: "Brenton Strange", position: "TE", positionRank: 18, tier: 22, auction: 1 },
+                { rank: 162, name: "Michael Penix", position: "QB", positionRank: 22, tier: 22, auction: 1 },
+                { rank: 163, name: "Hunter Henry", position: "TE", positionRank: 19, tier: 22, auction: 1 },
+                { rank: 164, name: "Zach Ertz", position: "TE", positionRank: 20, tier: 22, auction: 1 },
+                { rank: 165, name: "Wan'Dale Robinson", position: "WR", positionRank: 71, tier: 23, auction: 1 },
+                { rank: 166, name: "Najee Harris", position: "RB", positionRank: 53, tier: 23, auction: 1 },
+                { rank: 167, name: "Tyler Allgeier", position: "RB", positionRank: 54, tier: 23, auction: 1 },
+                { rank: 168, name: "Mason Taylor", position: "TE", positionRank: 21, tier: 23, auction: 1 },
+                { rank: 169, name: "Tua Tagovailoa", position: "QB", positionRank: 23, tier: 23, auction: 1 },
+                { rank: 170, name: "Cam Ward", position: "QB", positionRank: 24, tier: 23, auction: 1 },
+                { rank: 171, name: "Geno Smith", position: "QB", positionRank: 25, tier: 23, auction: 1 },
+                { rank: 172, name: "Adam Thielen", position: "WR", positionRank: 72, tier: 23, auction: 1 },
+                { rank: 173, name: "Sean Tucker", position: "RB", positionRank: 55, tier: 23, auction: 1 },
+                { rank: 174, name: "Kyle Monangai", position: "RB", positionRank: 56, tier: 23, auction: 1 },
+                { rank: 175, name: "Dameon Pierce", position: "RB", positionRank: 57, tier: 23, auction: 1 },
+                { rank: 176, name: "Tory Horton", position: "WR", positionRank: 73, tier: 23, auction: 1 },
+                { rank: 177, name: "Isaac TeSlaa", position: "WR", positionRank: 74, tier: 23, auction: 1 },
+                { rank: 178, name: "Chris Rodriguez", position: "RB", positionRank: 58, tier: 23, auction: 1 },
+                { rank: 179, name: "Adonai Mitchell", position: "WR", positionRank: 75, tier: 24, auction: 1 },
+                { rank: 180, name: "Justice Hill", position: "RB", positionRank: 59, tier: 24, auction: 1 },
+                { rank: 181, name: "Troy Franklin", position: "WR", positionRank: 76, tier: 24, auction: 1 },
+                { rank: 182, name: "Roschon Johnson", position: "RB", positionRank: 60, tier: 24, auction: 1 },
+                { rank: 183, name: "Aaron Rodgers", position: "QB", positionRank: 26, tier: 25, auction: 1 },
+                { rank: 184, name: "Elijah Arroyo", position: "TE", positionRank: 22, tier: 25, auction: 1 },
+                { rank: 185, name: "Quinshon Judkins", position: "RB", positionRank: 61, tier: 25, auction: 1 },
+                { rank: 186, name: "Jack Bech", position: "WR", positionRank: 77, tier: 25, auction: 1 },
+                { rank: 187, name: "Jalen Royals", position: "WR", positionRank: 78, tier: 25, auction: 1 },
+                { rank: 188, name: "Jonnu Smith", position: "TE", positionRank: 23, tier: 25, auction: 1 },
+                { rank: 189, name: "Tahj Brooks", position: "RB", positionRank: 62, tier: 25, auction: 1 },
+                { rank: 190, name: "Matthew Stafford", position: "QB", positionRank: 27, tier: 26, auction: 1 },
+                { rank: 191, name: "Malik Washington", position: "WR", positionRank: 79, tier: 26, auction: 1 },
+                { rank: 192, name: "DeAndre Hopkins", position: "WR", positionRank: 80, tier: 26, auction: 1 },
+                { rank: 193, name: "Isaiah Likely", position: "TE", positionRank: 24, tier: 26, auction: 1 },
+                { rank: 194, name: "Tyjae Spears", position: "RB", positionRank: 63, tier: 26, auction: 1 },
+                { rank: 195, name: "Pat Freiermuth", position: "TE", positionRank: 25, tier: 26, auction: 1 },
+                { rank: 196, name: "Theo Johnson", position: "TE", positionRank: 26, tier: 26, auction: 1 },
+                { rank: 197, name: "Brashard Smith", position: "RB", positionRank: 64, tier: 26, auction: 1 },
+                { rank: 198, name: "Amari Cooper", position: "WR", positionRank: 81, tier: 26, auction: 1 },
+                { rank: 199, name: "Jarquez Hunter", position: "RB", positionRank: 65, tier: 26, auction: 1 },
+                { rank: 200, name: "Ja'Tavion Sanders", position: "TE", positionRank: 27, tier: 26, auction: 1 },
+                { rank: 201, name: "Dyami Brown", position: "WR", positionRank: 82, tier: 26, auction: 1 },
+                { rank: 202, name: "Jaylin Noel", position: "WR", positionRank: 83, tier: 26, auction: 1 },
+                { rank: 203, name: "DJ Giddens", position: "RB", positionRank: 66, tier: 27, auction: 1 },
+                { rank: 204, name: "Harold Fannin", position: "TE", positionRank: 28, tier: 27, auction: 1 },
+                { rank: 205, name: "Alec Pierce", position: "WR", positionRank: 84, tier: 27, auction: 1 },
+                { rank: 206, name: "Olamide Zaccheaus", position: "WR", positionRank: 85, tier: 27, auction: 1 },
+                { rank: 207, name: "Mike Gesicki", position: "TE", positionRank: 29, tier: 27, auction: 1 },
+                { rank: 208, name: "Will Shipley", position: "RB", positionRank: 67, tier: 27, auction: 1 },
+                { rank: 209, name: "Joe Mixon", position: "RB", positionRank: 68, tier: 27, auction: 1 },
+                { rank: 210, name: "KeAndre Lambert-Smith", position: "WR", positionRank: 86, tier: 27, auction: 1 },
+                { rank: 211, name: "Keaton Mitchell", position: "RB", positionRank: 69, tier: 27, auction: 1 },
+                { rank: 212, name: "Dontayvion Wicks", position: "WR", positionRank: 87, tier: 27, auction: 1 },
+                { rank: 213, name: "Roman Wilson", position: "WR", positionRank: 88, tier: 27, auction: 1 },
+                { rank: 214, name: "Kareem Hunt", position: "RB", positionRank: 70, tier: 28, auction: 1 },
+                { rank: 215, name: "Juwan Johnson", position: "TE", positionRank: 30, tier: 28, auction: 1 },
+                { rank: 216, name: "Elic Ayomanor", position: "WR", positionRank: 89, tier: 28, auction: 1 },
+                { rank: 217, name: "Kayshon Boutte", position: "WR", positionRank: 90, tier: 28, auction: 1 },
+                { rank: 218, name: "Cade Otton", position: "TE", positionRank: 31, tier: 28, auction: 1 },
+                { rank: 219, name: "Darius Slayton", position: "WR", positionRank: 91, tier: 28, auction: 1 },
+                { rank: 220, name: "Oronde Gadsden", position: "TE", positionRank: 32, tier: 29, auction: 1 },
+                { rank: 221, name: "Blake Corum", position: "RB", positionRank: 71, tier: 29, auction: 1 },
+                { rank: 222, name: "Jaleel McLaughlin", position: "RB", positionRank: 72, tier: 29, auction: 1 },
+                { rank: 223, name: "Tyler Lockett", position: "WR", positionRank: 92, tier: 29, auction: 1 },
+                { rank: 224, name: "Calvin Austin", position: "WR", positionRank: 93, tier: 29, auction: 1 },
+                { rank: 225, name: "Andrei Iosivas", position: "WR", positionRank: 94, tier: 29, auction: 1 },
+                { rank: 226, name: "Miles Sanders", position: "RB", positionRank: 73, tier: 30, auction: 1 },
+                { rank: 227, name: "Tyler Higbee", position: "TE", positionRank: 33, tier: 30, auction: 1 },
+                { rank: 228, name: "Kendre Miller", position: "RB", positionRank: 74, tier: 30, auction: 1 },
+                { rank: 229, name: "Dalton Schultz", position: "TE", positionRank: 34, tier: 30, auction: 1 },
+                { rank: 230, name: "Sam Darnold", position: "QB", positionRank: 28, tier: 30, auction: 1 },
+                { rank: 231, name: "Jordan Whittington", position: "WR", positionRank: 95, tier: 30, auction: 1 },
+                { rank: 232, name: "Isaac Guerendo", position: "RB", positionRank: 75, tier: 31, auction: 1 },
+                { rank: 233, name: "Parker Washington", position: "WR", positionRank: 96, tier: 31, auction: 1 },
+                { rank: 234, name: "Russell Wilson", position: "QB", positionRank: 29, tier: 31, auction: 1 },
+                { rank: 235, name: "Emanuel Wilson", position: "RB", positionRank: 76, tier: 31, auction: 1 },
+                { rank: 236, name: "Devaughn Vele", position: "WR", positionRank: 97, tier: 31, auction: 1 },
+                { rank: 237, name: "Joe Flacco", position: "QB", positionRank: 30, tier: 31, auction: 1 },
+                { rank: 238, name: "Michael Wilson", position: "WR", positionRank: 98, tier: 31, auction: 1 },
+                { rank: 239, name: "Darren Waller", position: "TE", positionRank: 35, tier: 31, auction: 1 },
+                { rank: 240, name: "Raheem Mostert", position: "RB", positionRank: 77, tier: 31, auction: 1 },
+                { rank: 241, name: "Jaxson Dart", position: "QB", positionRank: 31, tier: 32, auction: 1 },
+                { rank: 242, name: "Trevor Etienne", position: "RB", positionRank: 78, tier: 32, auction: 1 },
+                { rank: 243, name: "Noah Gray", position: "TE", positionRank: 36, tier: 32, auction: 1 },
+                { rank: 244, name: "Quentin Johnston", position: "WR", positionRank: 99, tier: 32, auction: 1 },
+                { rank: 245, name: "Elijah Moore", position: "WR", positionRank: 100, tier: 32, auction: 1 },
+                { rank: 246, name: "Tutu Atwell", position: "WR", positionRank: 101, tier: 32, auction: 1 },
+                { rank: 247, name: "Isaiah Davis", position: "RB", positionRank: 79, tier: 32, auction: 1 },
+                { rank: 248, name: "Jaylen Wright", position: "RB", positionRank: 80, tier: 32, auction: 1 },
+                { rank: 249, name: "Jalen Tolbert", position: "WR", positionRank: 102, tier: 33, auction: 1 },
+                { rank: 250, name: "Tez Johnson", position: "WR", positionRank: 103, tier: 33, auction: 1 }
+            ];
+
+            const [draftedPlayers, setDraftedPlayers] = useState(new Set());
+            const [favorites, setFavorites] = useState(new Set());
+            const [positionFilter, setPositionFilter] = useState('ALL');
+            const [tierFilter, setTierFilter] = useState('ALL');
+            const [hideDrafted, setHideDrafted] = useState(false);
+
+            const toggleDrafted = (rank) => {
+                const newDrafted = new Set(draftedPlayers);
+                if (newDrafted.has(rank)) {
+                    newDrafted.delete(rank);
+                } else {
+                    newDrafted.add(rank);
+                }
+                setDraftedPlayers(newDrafted);
+            };
+
+            const toggleFavorite = (rank) => {
+                const newFavorites = new Set(favorites);
+                if (newFavorites.has(rank)) {
+                    newFavorites.delete(rank);
+                } else {
+                    newFavorites.add(rank);
+                }
+                setFavorites(newFavorites);
+            };
+
+            const filteredPlayers = useMemo(() => {
+                return playersData.filter(player => {
+                    const positionMatch = positionFilter === 'ALL' || player.position === positionFilter;
+                    const tierMatch = tierFilter === 'ALL' || player.tier.toString() === tierFilter;
+                    const draftedMatch = !hideDrafted || !draftedPlayers.has(player.rank);
+                    return positionMatch && tierMatch && draftedMatch;
+                });
+            }, [positionFilter, tierFilter, hideDrafted, draftedPlayers]);
+
+            const uniquePositions = [...new Set(playersData.map(p => p.position))].sort();
+            const uniqueTiers = [...new Set(playersData.map(p => p.tier))].sort((a, b) => a - b);
+
+            const getPositionColor = (position) => {
+                const colors = {
+                    'QB': 'bg-purple-100 text-purple-800 border-purple-200',
+                    'RB': 'bg-green-100 text-green-800 border-green-200',
+                    'WR': 'bg-blue-100 text-blue-800 border-blue-200',
+                    'TE': 'bg-orange-100 text-orange-800 border-orange-200'
+                };
+                return colors[position] || 'bg-gray-100 text-gray-800 border-gray-200';
+            };
+
+            const getTierColor = (tier) => {
+                if (tier <= 3) return 'bg-red-50 border-red-200';
+                if (tier <= 7) return 'bg-yellow-50 border-yellow-200';
+                if (tier <= 15) return 'bg-blue-50 border-blue-200';
+                return 'bg-gray-50 border-gray-200';
+            };
+
+            // Simple icons using Unicode characters
+            const StarIcon = ({ filled }) => (
+                <span style={{ fontSize: '16px', color: filled ? '#fbbf24' : '#9ca3af' }}>
+                    {filled ? '★' : '☆'}
+                </span>
+            );
+
+            const XIcon = () => (
+                <span style={{ fontSize: '16px' }}>×</span>
+            );
+
+            return (
+                <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                        Fantasy Football Draft Tracker 2025
+                    </h1>
+                    
+                    {/* Filters */}
+                    <div className="mb-6 flex flex-wrap gap-4 justify-center bg-white p-4 rounded-lg shadow-sm border">
+                        <div className="flex items-center gap-2">
+                            <label className="font-medium text-gray-700">Position:</label>
+                            <select 
+                                value={positionFilter} 
+                                onChange={(e) => setPositionFilter(e.target.value)}
+                                className="px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="ALL">All Positions</option>
+                                {uniquePositions.map(pos => (
+                                    <option key={pos} value={pos}>{pos}</option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                            <label className="font-medium text-gray-700">Tier:</label>
+                            <select 
+                                value={tierFilter} 
+                                onChange={(e) => setTierFilter(e.target.value)}
+                                className="px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="ALL">All Tiers</option>
+                                {uniqueTiers.map(tier => (
+                                    <option key={tier} value={tier.toString()}>Tier {tier}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-2 font-medium text-gray-700 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={hideDrafted}
+                                    onChange={(e) => setHideDrafted(e.target.checked)}
+                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                Hide Drafted
+                            </label>
+                        </div>
+
+                        <div className="text-sm text-gray-600 flex items-center gap-4">
+                            <span>Players shown: {filteredPlayers.length}</span>
+                            <span>Drafted: {draftedPlayers.size}</span>
+                            <span>Favorites: {favorites.size}</span>
+                        </div>
+                    </div>
+
+                    {/* Players Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {filteredPlayers.map((player) => {
+                            const isDrafted = draftedPlayers.has(player.rank);
+                            const isFavorite = favorites.has(player.rank);
+                            
+                            return (
+                                <div
+                                    key={player.rank}
+                                    className={`
+                                        ${getTierColor(player.tier)}
+                                        border-2 rounded-lg p-3 transition-all duration-200 hover:shadow-md
+                                        ${isDrafted ? 'opacity-50 bg-gray-200 border-gray-400' : ''}
+                                        ${isFavorite ? 'ring-2 ring-yellow-400' : ''}
+                                    `}
+                                >
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs font-bold text-gray-500">#{player.rank}</span>
+                                                <span className="text-xs text-gray-400">T{player.tier}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={() => toggleFavorite(player.rank)}
+                                                    className={`p-1 rounded-full transition-colors ${
+                                                        isFavorite 
+                                                            ? 'bg-yellow-400 text-yellow-900 hover:bg-yellow-500' 
+                                                            : 'bg-gray-200 text-gray-600 hover:bg-yellow-200'
+                                                    }`}
+                                                    title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                                                >
+                                                    <StarIcon filled={isFavorite} />
+                                                </button>
+                                                
+                                                <button
+                                                    onClick={() => toggleDrafted(player.rank)}
+                                                    className={`p-1 rounded-full transition-colors ${
+                                                        isDrafted 
+                                                            ? 'bg-red-500 text-white hover:bg-red-600' 
+                                                            : 'bg-gray-200 text-gray-600 hover:bg-red-200'
+                                                    }`}
+                                                    title={isDrafted ? 'Mark as available' : 'Mark as drafted'}
+                                                >
+                                                    <XIcon />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="text-center">
+                                            <div className={`font-semibold text-sm ${isDrafted ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                                                {player.name}
+                                            </div>
+                                            <div className="flex items-center justify-center gap-2 mt-1">
+                                                <span className={`px-2 py-1 text-xs font-medium rounded border ${getPositionColor(player.position)}`}>
+                                                    {player.position}{player.positionRank}
+                                                </span>
+                                                <span className="text-xs text-gray-600">
+                                                    ${player.auction}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    {filteredPlayers.length === 0 && (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500 text-lg">No players match the selected filters.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<DraftTracker />, document.getElementById('root'));
+    </script>
+</body>
+</html>
